@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Татарский тренажёр: правильные глаголы</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f0f6f3 0%, #e2ece8 100%);
+            font-family: 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .game-container {
+            max-width: 750px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(4px);
+            border-radius: 3rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.3);
+            padding: 2rem 1.8rem 2.2rem;
+            transition: all 0.2s;
+            border: 1px solid rgba(80, 130, 115, 0.25);
+        }
+
+        h1 {
+            font-size: 1.9rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1d6c5e, #2b9b87);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.25rem;
+        }
+
+        .sub {
+            color: #557c70;
+            font-weight: 500;
+            margin-bottom: 1.6rem;
+            border-left: 3px solid #359f8b;
+            padding-left: 0.8rem;
+            font-size: 0.9rem;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            background: #eef3f0;
+            border-radius: 100px;
+            padding: 0.6rem 1.4rem;
+            margin-bottom: 2rem;
+            font-weight: 600;
+            color: #1f5f54;
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 2rem;
+            padding: 1.8rem 1rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.05);
+        }
+
+        .russian-word {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a4e45;
+            background: #f4fbf8;
+            display: inline-block;
+            padding: 0.3rem 1.5rem;
+            border-radius: 60px;
+            letter-spacing: -0.3px;
+            margin-bottom: 0.5rem;
+        }
+
+        .question-hint {
+            font-size: 0.85rem;
+            color: #6a978d;
+            margin-top: 0.3rem;
+        }
+
+        .answers-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin: 1.5rem 0 1rem;
+        }
+
+        .answer-btn {
+            background: #f9fefc;
+            border: 2px solid #cde3dc;
+            border-radius: 60px;
+            padding: 1rem 1.2rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            color: #216b5e;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+
+        .answer-btn:hover:not(:disabled) {
+            background: #e5f4ef;
+            border-color: #6fc1b0;
+            transform: scale(1.01);
+        }
+
+        .answer-btn.correct-highlight {
+            background: #c8f0e4;
+            border-color: #169b80;
+            color: #0c5c4b;
+            box-shadow: 0 0 0 2px #b3e0d4;
+        }
+
+        .answer-btn.wrong-highlight {
+            background: #ffe0db;
+            border-color: #e0826e;
+            color: #9b3e2c;
+        }
+
+        .disabled-btn {
+            cursor: default;
+            opacity: 0.8;
+        }
+
+        .next-message {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #579f90;
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+
+        .result-screen {
+            text-align: center;
+        }
+
+        .score-ring {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: #f2f9f6;
+            display: inline-block;
+            padding: 0.5rem 1.8rem;
+            border-radius: 100px;
+            margin: 1rem 0;
+            color: #236b5e;
+        }
+
+        .verdict {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin: 0.8rem 0;
+        }
+
+        .verdict-message {
+            background: #eef3f0;
+            padding: 1rem;
+            border-radius: 2rem;
+            margin: 1rem 0;
+        }
+
+        .btn-restart {
+            background: #2b9b87;
+            border: none;
+            padding: 0.9rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 3rem;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 1rem;
+            width: 100%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .btn-restart:hover {
+            background: #1e7f6e;
+            transform: translateY(-2px);
+        }
+
+        footer {
+            margin-top: 2rem;
+            font-size: 0.7rem;
+            text-align: center;
+            color: #85ada2;
+        }
+    </style>
+</head>
+<body>
+<div class="game-container" id="app"></div>
+
+<script>
+    // ==============================================================
+    // ИСПРАВЛЕННАЯ БАЗА ГЛАГОЛОВ (русский → повелительная форма)
+    // Все переводы выверены по стандартным татарско-русским словарям
+    // ==============================================================
+    const VERBS_CORRECT = [
+        // --- Движение и перемещение (исправлено) ---
+        ["иди", "бар!"],
+        ["приходи", "кил!"],
+        ["возвращайся", "кайт!"],
+        ["выходи", "чык!"],
+        ["входи", "кер!"],
+        ["спускайся, выходи (из транспорта)", "төш!"],
+        ["вставай, стой", "тор!"],
+        ["садись", "утыр!"],
+        ["ложись", "ят!"],
+        ["беги", "йөгер!"],
+        ["прыгай", "сикер!"],
+        ["плыви", "йөз!"],
+        ["лети", "оч!"],
+        ["уходи", "кит!"],
+        ["оставайся", "кал!"],
+        ["ходи пешком, езди (регулярно)", "йөр!"],
+        ["води (транспорт)", "йөрт!"],
+
+        // --- Бытовые действия (верные) ---
+        ["ешь", "аша!"],
+        ["пей", "эч!"],
+        ["готовь, вари", "пешер!"],
+        ["чисти", "чистарт!"],
+        ["мой", "ю!"],
+        ["вытирай", "сөрт!"],
+        ["собирай", "җый!"],
+        ["клади (внутрь), наливай", "сал!"],
+        ["клади (на поверхность), ставь", "куй!"],
+        ["бери", "ал!"],
+        ["дай", "бир!"],
+        ["закрой", "яп!"],
+        ["открой", "ач!"],
+        ["бросай", "ташла!"],
+        ["работай", "эшлә!"],
+        ["отдыхай", "ял ит!"],
+        ["спи", "йокла!"],
+        ["просыпайся", "уян!"],
+        ["умывайся", "юын!"],
+        ["одевайся", "киен!"],
+        ["надевай (одежду)", "ки!"],
+        ["расчёсывай", "тара!"],
+        ["копай", "казы!"],
+        ["разрыхляй, смягчай", "йомшарт!"],
+        ["забивай, стучи", "как!"],
+        ["прокалывай", "тиш!"],
+        ["кипяти", "кайнат!"],
+
+        // --- Учёба, речь, мышление ---
+        ["читай, учись", "укы!"],
+        ["пиши", "яз!"],
+        ["учись, изучай", "өйрән!"],
+        ["повторяй", "кабатла!"],
+        ["разговаривай", "сөйләш!"],
+        ["скажи, произнеси", "әйт!"],
+        ["говори", "ди!"],
+        ["кричи", "кычкыр!"],
+        ["слушай", "тыңла!"],
+        ["объясняй", "аңлат!"],
+        ["пойми", "аңла!"],
+        ["думай", "уйла!"],
+        ["знай", "бел!"],
+        ["увидь", "күр!"],
+        ["услышь", "ишет!"],
+        ["считай", "сана!"],
+        ["найди", "тап!"],
+        ["ищи", "эзлә!"],
+
+        // --- Эмоции, чувства ---
+        ["люби", "ярат!"],
+        ["люби (романтически)", "сөй!"],
+        ["забывай", "оныт!"],
+        ["радуйся", "шатлан!"],
+        ["плачь", "ела!"],
+        ["смейся", "көл!"],
+        ["скучай", "сагын!"],
+        ["гордись", "горурлан!"],
+        ["болей", "авыр!"],
+
+        // --- Природа, погода, растения ---
+        ["иди (о снеге, дожде)", "яу!"],
+        ["тай", "эре!"],
+        ["созревай", "пеш!"],
+        ["расти", "үс!"],
+        ["покрывай", "капла!"],
+        ["цвети", "чәчәк ат!"],
+        ["кончайся", "бет!"],
+        ["останавливайся", "тукта!"],
+
+        // --- Здоровье и лечение ---
+        ["лечи", "дәвал!"],
+        ["кашляй", "йөткер!"],
+        ["проверяй, осматривай", "тикшер!"],
+        ["корми", "ашат!"],
+        ["пей (лекарство)", "эч!"],
+
+        // --- Помощь, забота, общение ---
+        ["помогай", "булыш!"],
+        ["помогай (ярдәм ит)", "ярдәм ит!"],
+        ["зови", "чакыр!"],
+        ["жди", "көт!"],
+        ["угощай", "сыйла!"],
+        ["поздравляй", "котла!"],
+        ["покупай", "сатып ал!"],
+
+        // --- Изменения, преобразования ---
+        ["изменяй", "үзгәрт!"],
+        ["делай", "яса!"],
+        ["рисуй", "рәсем яса!"],
+        ["дари", "бүләк ит!"],
+        ["переводи", "тәрҗемә ит!"],
+
+        // --- Другие важные глаголы ---
+        ["будь", "бул!"],
+        ["живи", "яшә!"],
+        ["остановись", "тукта!"],
+        ["бросай, стреляй", "ат!"],
+        ["держи", "тот!"],
+        ["поднимай", "күтәр!"]
+    ];
+
+    // Создаём массив объектов для удобства
+    const fullVerbList = VERBS_CORRECT.map(([russian, correct]) => ({ russian, correct }));
+
+    // --- Вспомогательные функции ---
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    // Генерация 3 вариантов: правильный + два случайных неправильных (из других глаголов)
+    function generateOptions(correctAnswer, currentRussian, totalPool) {
+        const others = totalPool.filter(item => item.russian !== currentRussian);
+        if (others.length < 2) {
+            return [correctAnswer, "бар!", "кил!"];
+        }
+        const shuffledOthers = shuffleArray([...others]);
+        const wrong = [];
+        for (let i = 0; i < 2 && i < shuffledOthers.length; i++) {
+            wrong.push(shuffledOthers[i].correct);
+        }
+        let options = [correctAnswer, ...wrong];
+        // Убедимся, что ровно 3 уникальных варианта
+        options = [...new Set(options)];
+        while (options.length < 3) {
+            const extra = totalPool.find(v => v.correct !== correctAnswer && !options.includes(v.correct));
+            if (extra) options.push(extra.correct);
+            else options.push("эшлә!");
+        }
+        return shuffleArray(options.slice(0,3));
+    }
+
+    // Подготовка 10 случайных уникальных вопросов
+    function prepareQuestions() {
+        const shuffledAll = shuffleArray([...fullVerbList]);
+        const selected = shuffledAll.slice(0, 10);
+        return selected.map(item => ({
+            russian: item.russian,
+            correct: item.correct,
+            options: generateOptions(item.correct, item.russian, fullVerbList)
+        }));
+    }
+
+    // Оценка результата
+    function getVerdict(scoreValue) {
+        if (scoreValue === 10) return { title: "🎉 Отлично! Вы знаток татарских глаголов! 🎉", message: "10 из 10! Безупречно!" };
+        if (scoreValue >= 8) return { title: "👍 Очень хорошо!", message: `${scoreValue} правильных. Вы на верном пути!` };
+        if (scoreValue >= 6) return { title: "📘 Неплохо", message: `${scoreValue} верных. Ещё немного практики — и будет отлично.` };
+        return { title: "😓 Нужно подтянуть", message: `${scoreValue} правильных. Попробуйте ещё раз — глаголы запомнятся!` };
+    }
+
+    // --- Состояние игры ---
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let waiting = false;
+    const app = document.getElementById('app');
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    function renderQuestion() {
+        if (currentIndex >= currentQuestions.length) {
+            showResult();
+            return;
+        }
+        const q = currentQuestions[currentIndex];
+        const progress = `${currentIndex+1} / ${currentQuestions.length}`;
+        let answersHtml = '';
+        for (let opt of q.options) {
+            answersHtml += `<button class="answer-btn" data-value="${escapeHtml(opt)}">${escapeHtml(opt)}</button>`;
+        }
+        const markup = `
+            <div>
+                <div class="stats">
+                    <span>🎯 Счёт: ${score}</span>
+                    <span>📋 Вопрос ${progress}</span>
+                </div>
+                <div class="question-card">
+                    <div class="russian-word">${escapeHtml(q.russian)}</div>
+                    <div class="question-hint">Выберите правильную повелительную форму на татарском</div>
+                    <div class="answers-grid" id="answersGrid">
+                        ${answersHtml}
+                    </div>
+                    <div id="feedbackMessage" class="next-message"></div>
+                </div>
+                <footer>Татарча: делай!</footer>
+            </div>
+        `;
+        app.innerHTML = markup;
+
+        const btns = document.querySelectorAll('.answer-btn');
+        btns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                if (waiting) return;
+                const selected = btn.getAttribute('data-value');
+                checkAnswer(selected, q.correct, btns);
+            });
+        });
+    }
+
+    function checkAnswer(selected, correct, allBtns) {
+        const isCorrect = (selected === correct);
+        if (isCorrect) score++;
+
+        allBtns.forEach(btn => {
+            const val = btn.getAttribute('data-value');
+            if (val === correct) btn.classList.add('correct-highlight');
+            if (!isCorrect && val === selected) btn.classList.add('wrong-highlight');
+            btn.disabled = true;
+            btn.classList.add('disabled-btn');
+        });
+
+        const feedback = document.getElementById('feedbackMessage');
+        if (isCorrect) {
+            feedback.innerHTML = '✅ Верно! +1 балл.';
+        } else {
+            feedback.innerHTML = `❌ Неверно. Правильно: <strong>${escapeHtml(correct)}</strong>.`;
+        }
+
+        waiting = true;
+        setTimeout(() => {
+            waiting = false;
+            currentIndex++;
+            renderQuestion();
+        }, 1200);
+    }
+
+    function showResult() {
+        const verdict = getVerdict(score);
+        app.innerHTML = `
+            <div class="result-screen">
+                <h1>🏆 Тренировка завершена</h1>
+                <div class="score-ring">${score} / 10</div>
+                <div class="verdict">${verdict.title}</div>
+                <div class="verdict-message">${verdict.message}</div>
+                <button class="btn-restart" id="restartBtn">🔄 Сыграть ещё раз</button>
+                <footer>Татарские глаголы в повелительной форме</footer>
+            </div>
+        `;
+        document.getElementById('restartBtn')?.addEventListener('click', () => initGame());
+    }
+
+    function initGame() {
+        currentQuestions = prepareQuestions();
+        currentIndex = 0;
+        score = 0;
+        waiting = false;
+        renderQuestion();
+    }
+
+    // Старт игры
+    initGame();
+</script>
+</body>
+</html>
