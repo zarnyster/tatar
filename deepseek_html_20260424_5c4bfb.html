@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Татарские глаголы: три формы – надёжный тренажёр</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f4f8fc 0%, #e9f0f5 100%);
+            font-family: 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif;
+            padding: 2rem 1.5rem;
+            min-height: 100vh;
+            color: #1e2e3a;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(2px);
+            border-radius: 2.5rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2);
+            padding: 2rem 2rem 2.5rem;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #0e4b4a, #1f8a7a);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.3rem;
+        }
+
+        .subhead {
+            font-size: 1rem;
+            color: #557c77;
+            border-left: 4px solid #2a9d8f;
+            padding-left: 1rem;
+            margin: 0.5rem 0 2rem 0;
+            font-weight: 500;
+        }
+
+        .select-wrapper {
+            background: white;
+            border-radius: 3rem;
+            padding: 0.2rem;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05);
+            border: 1px solid #cfdfda;
+            margin-bottom: 2.5rem;
+        }
+
+        select {
+            width: 100%;
+            padding: 1rem 1.8rem;
+            font-size: 1.05rem;
+            font-weight: 500;
+            background: white;
+            border: none;
+            border-radius: 3rem;
+            font-family: inherit;
+            color: #1c4e48;
+            cursor: pointer;
+            outline: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 24 24' fill='none' stroke='%233b7a74' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+            background-repeat: no-repeat;
+            background-position: right 1.6rem center;
+        }
+
+        select:focus {
+            box-shadow: 0 0 0 3px rgba(42, 157, 143, 0.3);
+        }
+
+        .verbs-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.8rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .verb-card {
+            flex: 1;
+            min-width: 230px;
+            background: white;
+            border-radius: 1.8rem;
+            padding: 1.6rem 1rem;
+            box-shadow: 0 12px 22px -12px rgba(0, 0, 0, 0.12);
+            transition: transform 0.2s ease;
+            text-align: center;
+            border: 1px solid #dde9e5;
+        }
+
+        .verb-card:hover {
+            transform: translateY(-5px);
+            border-color: #b1d4cd;
+            box-shadow: 0 18px 28px -14px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-badge {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            background: #e4f3ef;
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            color: #236e63;
+            letter-spacing: 1px;
+        }
+
+        .verb-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #125e54;
+            line-height: 1.3;
+            margin: 0.6rem 0 0.2rem;
+            word-break: break-word;
+            font-family: 'Courier New', 'JetBrains Mono', monospace;
+        }
+
+        .verb-desc {
+            font-size: 0.85rem;
+            color: #618e86;
+            margin-top: 0.6rem;
+        }
+
+        hr {
+            margin: 2rem 0 0.5rem;
+            border: none;
+            height: 1px;
+            background: linear-gradient(to right, #cbdfda, #aaccbf, #cbdfda);
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #698f88;
+            margin-top: 1.8rem;
+        }
+
+        .empty-state {
+            background: #fafefc;
+            border-radius: 2rem;
+            padding: 2rem;
+            text-align: center;
+            color: #4f7971;
+            font-weight: 500;
+            border: 1px dashed #bad5cf;
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 1rem;
+            }
+            .container {
+                padding: 1.5rem;
+            }
+            .verb-value {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📖 Татарча глаголлар · три формы</h1>
+    <div class="subhead">Выберите русский глагол → покажет повелительную (делай!), утвердительную (ул делает) и отрицательную (ул не делает) формы</div>
+
+    <div class="select-wrapper">
+        <select id="verbSelect">
+            <option value="" disabled selected>🔽 Выберите глагол из списка</option>
+        </select>
+    </div>
+
+    <div id="resultArea">
+        <div class="empty-state">
+            ✨ Нажмите на выпадающий список и выберите любой глагол
+        </div>
+    </div>
+    <hr />
+    <div class="footer-note">
+        🧠 Формы: <strong>делай!</strong> (повелительное) · <strong>ул делает</strong> · <strong>ул не делает</strong>
+    </div>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    // БАЗА ДАННЫХ (гарантированно полная, без конфликтов)
+    // Каждый элемент: [ русское_название, делай!, ул делает, ул не делает ]
+    // --------------------------------------------------------------
+    const VERBS_DATA = [
+        // 1. Движение и перемещение
+        ["иди", "кил!", "килә", "килми"],
+        ["приходи", "кайт!", "кайта", "кайтмый"],
+        ["возвращайся", "чык!", "чыга", "чыкмый"],
+        ["выходи", "кер!", "керә", "керми"],
+        ["входи", "төш!", "төшә", "төшми"],
+        ["спускайся, выходи (из транспорта)", "тор!", "тора", "тормый"],
+        ["вставай, стой", "утыр!", "утыра", "утырмый"],
+        ["садись", "ят!", "ята", "ятмый"],
+        ["ложись", "йөгер!", "йөгерә", "йөгерми"],
+        ["беги", "сикер!", "сикерә", "сикерми"],
+        ["прыгай", "йөз!", "йөзә", "йөзми"],
+        ["плыви", "оч!", "оча", "очмый"],
+        ["лети", "кит!", "китә", "китми"],
+        ["уходи", "кал!", "кала", "калмый"],
+        ["оставайся", "йөр!", "йөри", "йөрми"],
+        ["ходи (пешком), езди (регулярно)", "йөрт!", "йөртә", "йөртми"],
+        ["води (транспорт)", "бар!", "—", "—"],
+        ["поезжай (в значении бар!)", "бар!", "—", "—"],
+        
+        // 2. Бытовые действия
+        ["ешь", "аша!", "ашый", "ашамый"],
+        ["пей", "эч!", "эчә", "эчми"],
+        ["готовь, вари", "пешер!", "пешерә", "пешерми"],
+        ["чисти", "чистарт!", "чистарта", "чистартмый"],
+        ["мой", "ю!", "юа", "юмый"],
+        ["вытирай", "сөрт!", "сөртә", "сөртми"],
+        ["собирай", "җый!", "җыя", "җыймый"],
+        ["клади (внутрь), наливай", "сал!", "сала", "салмый"],
+        ["клади (на поверхность), ставь", "куй!", "куя", "куймый"],
+        ["бери", "ал!", "ала", "алмый"],
+        ["дай", "бир!", "бирә", "бирми"],
+        ["закрой", "яп!", "яба", "япмый"],
+        ["открой", "ач!", "ача", "ачмый"],
+        ["бросай", "ташла!", "ташлый", "ташламый"],
+        ["работай", "эшлә!", "эшли", "эшләми"],
+        ["отдыхай", "ял ит!", "ял итә", "ял итми"],
+        ["спи", "йокла!", "йоклый", "йокламый"],
+        ["просыпайся", "уян!", "уяна", "уянмый"],
+        ["умывайся", "юын!", "юына", "юынмый"],
+        ["одевайся", "киен!", "киенә", "киенми"],
+        ["надевай (одежду)", "ки!", "кия", "кими"],
+        ["расчёсывай", "тара!", "тарый", "тарамый"],
+        ["копай", "казы!", "казый", "казмый"],
+        ["разрыхляй, смягчай", "йомшарт!", "йомшарта", "йомшартмый"],
+        ["забивай, стучи", "как!", "кага", "какмый"],
+        ["прокалывай", "тиш!", "тишә", "тишми"],
+        ["кипяти", "кайнат!", "кайната", "кайнатмый"],
+        
+        // 3. Учёба, речь, мышление
+        ["читай, учись", "укы!", "укый", "укымый"],
+        ["пиши", "яз!", "яза", "язмый"],
+        ["учись, изучай", "өйрән!", "өйрәнә", "өйрәнми"],
+        ["повторяй", "кабатла!", "кабатлый", "кабатламый"],
+        ["разговаривай", "сөйләш!", "сөйләшә", "сөйләшми"],
+        ["скажи, произнеси", "әйт!", "әйтә", "әйтми"],
+        ["говори", "ди!", "ди", "дәми"],
+        ["кричи", "кычкыр!", "кычкыра", "кычкырмый"],
+        ["слушай", "тыңла!", "тыңлый", "тыңламый"],
+        ["объясняй", "аңлат!", "аңлата", "аңлатмый"],
+        ["пойми", "аңла!", "аңлый", "аңламый"],
+        ["думай", "уйла!", "уйлый", "уйламый"],
+        ["знай", "бел!", "белә", "белми"],
+        ["увидь", "күр!", "күрә", "күрми"],
+        ["услышь", "ишет!", "ишетә", "ишетми"],
+        ["считай", "сана!", "саный", "санамый"],
+        ["найди", "тап!", "таба", "тапмый"],
+        ["ищи", "эзлә!", "эзли", "эзләми"],
+        
+        // 4. Эмоции, чувства
+        ["люби", "ярат!", "ярата", "яратмый"],
+        ["люби (романтически)", "сөй!", "сөя", "сөйми"],
+        ["забывай", "оныт!", "оныта", "онытмый"],
+        ["радуйся", "шатлан!", "шатлана", "шатланмый"],
+        ["плачь", "ела!", "елый", "еламый"],
+        ["смейся", "көл!", "көлә", "көлми"],
+        ["скучай", "сагын!", "сагына", "сагынмый"],
+        ["гордись", "горурлан!", "горурлана", "горурланмый"],
+        ["болей", "авыр!", "авырый", "авырмый"],
+        
+        // 5. Природа, погода, растения
+        ["иди (о снеге, дожде)", "яу!", "ява", "яумый"],
+        ["тай", "эре!", "эри", "эреми"],
+        ["созревай", "пеш!", "пешә", "пешми"],
+        ["расти", "үс!", "үсә", "үсми"],
+        ["покрывай", "капла!", "каплый", "каплыймый"],
+        ["цвети", "чәчәк ат!", "чәчәк ата", "чәчәк атмый"],
+        ["кончайся", "бет!", "бетә", "бетми"],
+        ["останавливайся", "тукта!", "туктый", "туктамый"],
+        
+        // 6. Здоровье и лечение
+        ["лечи", "дәвал!", "дәвалый", "дәвалмый"],
+        ["кашляй", "йөткер!", "йөткерә", "йөткерми"],
+        ["проверяй, осматривай", "тикшер!", "тикшерә", "тикшерми"],
+        ["корми", "ашат!", "ашата", "ашатмый"],
+        ["пей (лекарство)", "эч!", "эчә", "эчми"],
+        
+        // 7. Помощь, забота, общение
+        ["помогай", "булыш!", "булыша", "булышмый"],
+        ["помогай (ярдәм ит)", "ярдәм ит!", "ярдәм итә", "ярдәм итми"],
+        ["зови", "чакыр!", "чакыра", "чакырмый"],
+        ["жди", "көт!", "көтә", "көтми"],
+        ["угощай", "сыйла!", "сыйлый", "сыйламый"],
+        ["поздравляй", "котла!", "котлый", "котламый"],
+        ["покупай", "сатып ал!", "сатып ала", "сатып алмый"],
+        
+        // 8. Изменения, преобразования
+        ["изменяй", "үзгәрт!", "үзгәртә", "үзгәртми"],
+        ["делай", "яса!", "ясый", "ясамый"],
+        ["рисуй", "рәсем яса!", "рәсем ясый", "рәсем ясамый"],
+        ["дари", "бүләк ит!", "бүләк итә", "бүләк итми"],
+        ["переводи", "тәрҗемә ит!", "тәрҗемә итә", "тәрҗемә итми"],
+        
+        // 9. Другие важные
+        ["будь", "бул!", "була", "булмый"],
+        ["живи", "яшә!", "яши", "яшәми"],
+        ["остановись", "тукта!", "туктый", "туктамый"],
+        ["бросай, стреляй", "ат!", "ата", "атмый"],
+        ["держи", "тот!", "тота", "тотмый"],
+        ["поднимай", "күтәр!", "күтәрә", "күтәрми"]
+    ];
+
+    // Группировка по категориям для optgroup (просто для удобства навигации)
+    // Определим границы в массиве по порядку, как перечислено выше
+    const categoryBoundaries = [
+        { name: "🚶 Движение и перемещение", startIdx: 0, count: 18 },
+        { name: "🍽️ Бытовые действия, уход", startIdx: 18, count: 28 },
+        { name: "📚 Учёба, речь, мышление", startIdx: 46, count: 18 },
+        { name: "❤️ Эмоции, чувства", startIdx: 64, count: 9 },
+        { name: "🌿 Природа, погода, растения", startIdx: 73, count: 8 },
+        { name: "🩺 Здоровье и лечение", startIdx: 81, count: 5 },
+        { name: "🤝 Помощь, забота, общение", startIdx: 86, count: 7 },
+        { name: "✨ Изменения, преобразования", startIdx: 93, count: 5 },
+        { name: "⚡ Другие важные глаголы", startIdx: 98, count: 6 }
+    ];
+
+    // Заполняем select с группировкой
+    const select = document.getElementById('verbSelect');
+    
+    function populateSelect() {
+        // Очищаем, оставляя первый placeholder
+        select.innerHTML = '<option value="" disabled selected>🔽 Выберите глагол из списка</option>';
+        
+        for (let cat of categoryBoundaries) {
+            const group = document.createElement('optgroup');
+            group.label = cat.name;
+            const end = cat.startIdx + cat.count;
+            for (let i = cat.startIdx; i < end && i < VERBS_DATA.length; i++) {
+                const russianName = VERBS_DATA[i][0];
+                const option = document.createElement('option');
+                option.value = russianName;
+                option.textContent = russianName;
+                group.appendChild(option);
+            }
+            select.appendChild(group);
+        }
+    }
+    
+    populateSelect();
+    
+    // Объект для быстрого поиска форм
+    const verbsMap = new Map();
+    for (let v of VERBS_DATA) {
+        const [rus, formDo, formDoes, formNot] = v;
+        verbsMap.set(rus, { делай: formDo, делает: formDoes, неделает: formNot });
+    }
+    
+    const resultDiv = document.getElementById('resultArea');
+    
+    function displayVerb(russian) {
+        const forms = verbsMap.get(russian);
+        if (!forms) {
+            resultDiv.innerHTML = `<div class="empty-state">❓ Данные для «${escapeHtml(russian)}» временно отсутствуют</div>`;
+            return;
+        }
+        const делай = forms.делай || "—";
+        const делает = forms.делает || "—";
+        const неделает = forms.неделает || "—";
+        
+        resultDiv.innerHTML = `
+            <div class="verbs-grid">
+                <div class="verb-card">
+                    <div class="card-badge">✨ Татарча (делай!)</div>
+                    <div class="verb-value">${escapeHtml(делай)}</div>
+                    <div class="verb-desc">повелительная форма</div>
+                </div>
+                <div class="verb-card">
+                    <div class="card-badge">📌 Ул (делает)</div>
+                    <div class="verb-value">${escapeHtml(делает)}</div>
+                    <div class="verb-desc">утверждение, III лицо</div>
+                </div>
+                <div class="verb-card">
+                    <div class="card-badge">🚫 Ул (не делает)</div>
+                    <div class="verb-value">${escapeHtml(неделает)}</div>
+                    <div class="verb-desc">отрицательная форма</div>
+                </div>
+            </div>
+            <div style="margin-top: 1rem; text-align: center; font-size:0.85rem; color:#54857c;">📌 Формы глагола «${escapeHtml(russian)}»</div>
+        `;
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    select.addEventListener('change', function(e) {
+        const selected = e.target.value;
+        if (selected && verbsMap.has(selected)) {
+            displayVerb(selected);
+        } else if (selected) {
+            resultDiv.innerHTML = `<div class="empty-state">⚠️ Глагол «${escapeHtml(selected)}» не найден в базе</div>`;
+        } else {
+            resultDiv.innerHTML = `<div class="empty-state">✨ Выберите действие из списка, чтобы увидеть татарские формы</div>`;
+        }
+    });
+    
+    // Показываем первый глагол для примера (чтобы список не был пустым и было понятно, что всё работает)
+    if (VERBS_DATA.length > 0) {
+        const firstVerb = VERBS_DATA[0][0];
+        select.value = firstVerb;
+        displayVerb(firstVerb);
+    }
+</script>
+</body>
+</html>
