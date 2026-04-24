@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Татарский тренажёр: 6 категорий + Дзен</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f0f6f3 0%, #e2ece8 100%);
+            font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .game-container {
+            max-width: 850px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(4px);
+            border-radius: 2.5rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.3);
+            padding: 2rem 1.8rem;
+            border: 1px solid rgba(80, 130, 115, 0.25);
+        }
+
+        h1 {
+            font-size: 1.9rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1d6c5e, #2b9b87);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .sub {
+            text-align: center;
+            color: #557c70;
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .cat-btn {
+            background: white;
+            border: 2px solid #cde3dc;
+            border-radius: 2rem;
+            padding: 1rem 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1f6b5e;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .cat-btn:hover {
+            background: #e5f4ef;
+            border-color: #2b9b87;
+            transform: translateY(-3px);
+        }
+
+        .zen-wrapper {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0 1rem;
+        }
+        .btn-zen {
+            background: linear-gradient(135deg, #ffd89b, #c7e9fb);
+            border: 2px solid #d4a373;
+            color: #6b4e2e;
+            font-size: 1.3rem;
+            padding: 1.2rem 2rem;
+            border-radius: 3rem;
+            width: 80%;
+            max-width: 350px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-zen:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            background: #eef3f0;
+            border-radius: 100px;
+            padding: 0.6rem 1.4rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            color: #1f5f54;
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 2rem;
+            padding: 1.8rem 1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.05);
+        }
+
+        .russian-word {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a4e45;
+            background: #f4fbf8;
+            display: inline-block;
+            padding: 0.3rem 1.5rem;
+            border-radius: 60px;
+            margin-bottom: 0.5rem;
+        }
+
+        .answers-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+            margin: 1.5rem 0 1rem;
+        }
+
+        .answer-btn {
+            background: #f9fefc;
+            border: 2px solid #cde3dc;
+            border-radius: 60px;
+            padding: 0.9rem;
+            font-size: 1.15rem;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            color: #216b5e;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .answer-btn:hover:not(:disabled) {
+            background: #e5f4ef;
+            border-color: #6fc1b0;
+        }
+
+        .answer-btn.correct-highlight {
+            background: #c8f0e4;
+            border-color: #169b80;
+            color: #0c5c4b;
+            box-shadow: 0 0 0 2px #b3e0d4;
+        }
+
+        .answer-btn.wrong-highlight {
+            background: #ffe0db;
+            border-color: #e0826e;
+            color: #9b3e2c;
+        }
+
+        .disabled-btn {
+            cursor: default;
+            opacity: 0.8;
+        }
+
+        .feedback-area {
+            background: #f8fefb;
+            padding: 1rem;
+            border-radius: 1.5rem;
+            margin: 1rem 0;
+            text-align: left;
+            border-left: 5px solid #2b9b87;
+        }
+
+        .example-text {
+            background: #f0f5f2;
+            padding: 0.6rem;
+            border-radius: 1rem;
+            margin-top: 0.6rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        .next-btn, .back-menu-btn {
+            background: #2b9b87;
+            border: none;
+            padding: 0.9rem;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 3rem;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .back-menu-btn {
+            background: #8aa9a1;
+            margin-top: 0.8rem;
+        }
+
+        .next-btn:hover, .back-menu-btn:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        .result-screen {
+            text-align: center;
+        }
+
+        .score-ring {
+            font-size: 3rem;
+            font-weight: 800;
+            background: #f2f9f6;
+            display: inline-block;
+            padding: 0.5rem 1.8rem;
+            border-radius: 100px;
+            margin: 1rem 0;
+            color: #236b5e;
+        }
+
+        .btn-restart {
+            background: #2b9b87;
+            border: none;
+            padding: 0.9rem;
+            font-size: 1rem;
+            border-radius: 3rem;
+            color: white;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        footer {
+            margin-top: 2rem;
+            font-size: 0.7rem;
+            text-align: center;
+            color: #85ada2;
+        }
+    </style>
+</head>
+<body>
+<div class="game-container" id="app"></div>
+
+<script>
+    // ================================================================
+    // БАЗА СЛОВ (6 категорий)
+    // category: "home_family", "animals", "food", "nature_seasons", "school_work", "other"
+    // ================================================================
+    const ALL_WORDS = [
+        // 1. Дом и семья (мебель, родственники, быт)
+        { rus: "окно", tat: "тәрәзә", example: "Тәрәзәдән кояш керә.", translation: "В окно заходит солнце.", category: "home_family" },
+        { rus: "тарелка", tat: "тәлинкә", example: "Тәлинкәне өстәлгә куй.", translation: "Поставь тарелку на стол.", category: "home_family" },
+        { rus: "ложка", tat: "кашык", example: "Кашык белән аш аша.", translation: "Ешь суп ложкой.", category: "home_family" },
+        { rus: "стул", tat: "урындык", example: "Бу урындык бик уңайлы.", translation: "Этот стул очень удобный.", category: "home_family" },
+        { rus: "стол", tat: "өстәл", example: "Өстәлдә китап ята.", translation: "На столе лежит книга.", category: "home_family" },
+        { rus: "дверь", tat: "ишек", example: "Ишекне яп, салкын керә.", translation: "Закрой дверь, холодно.", category: "home_family" },
+        { rus: "комната", tat: "бүлмә", example: "Минем бүлмәм зур түгел.", translation: "Моя комната не большая.", category: "home_family" },
+        { rus: "кровать", tat: "карават", example: "Караватка яттым.", translation: "Я лёг в кровать.", category: "home_family" },
+        { rus: "холодильник", tat: "суыткыч", example: "Суыткычта сөт бар.", translation: "В холодильнике есть молоко.", category: "home_family" },
+        { rus: "подарок", tat: "бүләк", example: "Сиңа бүләк алдым.", translation: "Я купил тебе подарок.", category: "home_family" },
+        { rus: "бабушка", tat: "әби", example: "Әби матур итеп аш пешерә.", translation: "Бабушка вкусно готовит.", category: "home_family" },
+        { rus: "дедушка", tat: "дәү әти", example: "Дәү әтигә 80 яшь.", translation: "Дедушке 80 лет.", category: "home_family" },
+        { rus: "мама", tat: "әни", example: "Әнием эштә.", translation: "Моя мама на работе.", category: "home_family" },
+        { rus: "папа", tat: "әти", example: "Әтием машина йөртә.", translation: "Мой папа водит машину.", category: "home_family" },
+        { rus: "ребёнок", tat: "бала", example: "Балалар бакчада уйный.", translation: "Дети играют в саду.", category: "home_family" },
+        { rus: "мальчик", tat: "малай", example: "Малай китап укый.", translation: "Мальчик читает книгу.", category: "home_family" },
+        { rus: "девочка", tat: "кыз", example: "Кыз бик матур.", translation: "Девочка очень красивая.", category: "home_family" },
+        { rus: "младший брат", tat: "эне", example: "Минем энем кечкенә.", translation: "Мой младший брат маленький.", category: "home_family" },
+        { rus: "жена", tat: "хатын", example: "Хатыным белән кибеткә бардым.", translation: "Я с женой пошёл в магазин.", category: "home_family" },
+        { rus: "семья", tat: "гаилә", example: "Гаиләм зур.", translation: "Моя семья большая.", category: "home_family" },
+        
+        // 2. Животные
+        { rus: "ворона", tat: "карга", example: "Карга агачта утыра.", translation: "Ворона сидит на дереве.", category: "animals" },
+        { rus: "птица", tat: "кош", example: "Кош оча.", translation: "Птица летит.", category: "animals" },
+        { rus: "заяц", tat: "куян", example: "Куян кыска койрыклы.", translation: "У зайца короткий хвост.", category: "animals" },
+        { rus: "лиса", tat: "төлке", example: "Төлке куян эзли.", translation: "Лиса ищет зайца.", category: "animals" },
+        { rus: "волк", tat: "бүре", example: "Бүре ач.", translation: "Волк голодный.", category: "animals" },
+        { rus: "медведь", tat: "аю", example: "Аю урманда йоклый.", translation: "Медведь спит в лесу.", category: "animals" },
+        { rus: "ёжик", tat: "керпе", example: "Керпе энәле.", translation: "Ёж колючий.", category: "animals" },
+        { rus: "собака", tat: "эт", example: "Эт өрә.", translation: "Собака лает.", category: "animals" },
+        { rus: "кошка", tat: "песи", example: "Песи йоклый.", translation: "Кошка спит.", category: "animals" },
+        { rus: "утка", tat: "үрдәк", example: "Үрдәк күлдә йөзә.", translation: "Утка плавает в озере.", category: "animals" },
+        { rus: "гусь", tat: "каз", example: "Каз оча.", translation: "Гусь летит.", category: "animals" },
+        { rus: "рыба", tat: "балык", example: "Балык бәрәңге белән яхшы.", translation: "Рыба с картошкой хороша.", category: "animals" },
+        { rus: "курица", tat: "тавык", example: "Тавык шулпасы пешердем.", translation: "Я сварил куриный бульон.", category: "animals" },
+        { rus: "лошадь", tat: "ат", example: "Ат чаба.", translation: "Лошадь бежит.", category: "animals" },
+        { rus: "слон", tat: "фил", example: "Фил зур.", translation: "Слон большой.", category: "animals" },
+        
+        // 3. Еда
+        { rus: "суп", tat: "аш", example: "Аш бик тәмле.", translation: "Суп очень вкусный.", category: "food" },
+        { rus: "хлеб", tat: "ипи", example: "Ипи сатып алдым.", translation: "Я купил хлеб.", category: "food" },
+        { rus: "чай", tat: "чәй", example: "Чәй эчәсе килә.", translation: "Хочется чаю.", category: "food" },
+        { rus: "молоко", tat: "сөт", example: "Сөт салкын.", translation: "Молоко холодное.", category: "food" },
+        { rus: "яйцо", tat: "йомырка", example: "Йомырка пешкән.", translation: "Яйцо сварилось.", category: "food" },
+        { rus: "мясо", tat: "ит", example: "Ит озак пешә.", translation: "Мясо долго варится.", category: "food" },
+        { rus: "картофель", tat: "бәрәңге", example: "Бәрәңге пешердек.", translation: "Мы сварили картошку.", category: "food" },
+        { rus: "морковь", tat: "кишер", example: "Кишер файдалы.", translation: "Морковь полезная.", category: "food" },
+        { rus: "огурец", tat: "кыяр", example: "Кыяр тозладык.", translation: "Мы засолили огурцы.", category: "food" },
+        { rus: "помидор", tat: "помидор", example: "Помидорлар кызыл.", translation: "Помидоры красные.", category: "food" },
+        { rus: "соль", tat: "тоз", example: "Ашка тоз сал.", translation: "Посоли суп.", category: "food" },
+        { rus: "сахар", tat: "шикәр", example: "Чәйгә шикәр салма.", translation: "Не клади сахар в чай.", category: "food" },
+        { rus: "мёд", tat: "бал", example: "Бал бик тәмле.", translation: "Мёд очень вкусный.", category: "food" },
+        
+        // 4. Времена года и природа
+        { rus: "весна", tat: "яз", example: "Яз җитте.", translation: "Весна наступила.", category: "nature_seasons" },
+        { rus: "лето", tat: "җәй", example: "Җәйдә кояшлы.", translation: "Летом солнечно.", category: "nature_seasons" },
+        { rus: "осень", tat: "көз", example: "Көзен салкын.", translation: "Осенью холодно.", category: "nature_seasons" },
+        { rus: "зима", tat: "кыш", example: "Кышын кар күп.", translation: "Зимой много снега.", category: "nature_seasons" },
+        { rus: "день", tat: "көн", example: "Бүген яхшы көн.", translation: "Сегодня хороший день.", category: "nature_seasons" },
+        { rus: "ночь", tat: "төн", example: "Төн озын.", translation: "Ночь длинная.", category: "nature_seasons" },
+        { rus: "снег", tat: "кар", example: "Кар ява.", translation: "Идёт снег.", category: "nature_seasons" },
+        { rus: "дождь", tat: "яңгыр", example: "Яңгыр ява.", translation: "Идёт дождь.", category: "nature_seasons" },
+        { rus: "солнце", tat: "кояш", example: "Кояш чыкты.", translation: "Солнце встало.", category: "nature_seasons" },
+        { rus: "ветер", tat: "җил", example: "Җил көчле исә.", translation: "Ветер сильно дует.", category: "nature_seasons" },
+        { rus: "дерево", tat: "агач", example: "Агач биек.", translation: "Дерево высокое.", category: "nature_seasons" },
+        { rus: "лес", tat: "урман", example: "Урманда матур.", translation: "В лесу красиво.", category: "nature_seasons" },
+        { rus: "цветок", tat: "чәчәк", example: "Чәчәкләр үсә.", translation: "Цветы растут.", category: "nature_seasons" },
+        { rus: "трава", tat: "үлән", example: "Үлән яшел.", translation: "Трава зелёная.", category: "nature_seasons" },
+        { rus: "река", tat: "елга", example: "Елгада балык бар.", translation: "В реке есть рыба.", category: "nature_seasons" },
+        { rus: "гора", tat: "тау", example: "Тау биек.", translation: "Гора высокая.", category: "nature_seasons" },
+        
+        // 5. Школа и работа
+        { rus: "школа", tat: "мәктәп", example: "Мәктәпкә бардым.", translation: "Я пошёл в школу.", category: "school_work" },
+        { rus: "класс", tat: "сыйныф", example: "Безнең сыйныф якты.", translation: "Наш класс светлый.", category: "school_work" },
+        { rus: "урок", tat: "дәрес", example: "Дәрес башланды.", translation: "Урок начался.", category: "school_work" },
+        { rus: "книга", tat: "китап", example: "Китапны укыдым.", translation: "Я прочитал книгу.", category: "school_work" },
+        { rus: "ручка", tat: "каләм", example: "Каләм югалды.", translation: "Ручка потерялась.", category: "school_work" },
+        { rus: "тетрадь", tat: "дәфтәр", example: "Дәфтәргә язам.", translation: "Я пишу в тетради.", category: "school_work" },
+        { rus: "учитель", tat: "укытучы", example: "Укытучы дәрес аңлата.", translation: "Учитель объясняет урок.", category: "school_work" },
+        { rus: "ученик", tat: "укучы", example: "Укучылар укыйлар.", translation: "Ученики учатся.", category: "school_work" },
+        { rus: "работа", tat: "эш", example: "Эш күп.", translation: "Работы много.", category: "school_work" },
+        { rus: "коллега", tat: "эштәш", example: "Эштәшем ярдәм итте.", translation: "Мой коллега помог.", category: "school_work" },
+        { rus: "офис", tat: "офис", example: "Офиста эшли.", translation: "Работает в офисе.", category: "school_work" },
+        { rus: "директор", tat: "директор", example: "Директор бүлмәдә.", translation: "Директор в кабинете.", category: "school_work" },
+        
+        // 6. Другие категории (чувства, тело, город, транспорт, абстракции)
+        { rus: "город", tat: "шәһәр", example: "Казан зур шәһәр.", translation: "Казань — большой город.", category: "other" },
+        { rus: "улица", tat: "урам", example: "Урамда кешеләр күп.", translation: "На улице много людей.", category: "other" },
+        { rus: "машина", tat: "машина", example: "Машина йөртә.", translation: "Водит машину.", category: "other" },
+        { rus: "магазин", tat: "кибет", example: "Кибеткә кердем.", translation: "Я зашёл в магазин.", category: "other" },
+        { rus: "врач", tat: "табиб", example: "Табиб авыруны дәвалый.", translation: "Врач лечит больного.", category: "other" },
+        { rus: "любовь", tat: "мәхәббәт", example: "Мәхәббәт көчле.", translation: "Любовь сильна.", category: "other" },
+        { rus: "счастье", tat: "бәхет", example: "Бәхет телим.", translation: "Желаю счастья.", category: "other" },
+        { rus: "здоровье", tat: "сәламәтлек", example: "Сәламәтлек телим.", translation: "Желаю здоровья.", category: "other" },
+        { rus: "рука", tat: "кул", example: "Куллымны юдым.", translation: "Я помыл руку.", category: "other" },
+        { rus: "голова", tat: "баш", example: "Баш авырта.", translation: "Голова болит.", category: "other" },
+        { rus: "время", tat: "вакыт", example: "Вакыт тиз уза.", translation: "Время быстро идёт.", category: "other" },
+        { rus: "друг", tat: "дус", example: "Бу минем дусым.", translation: "Это мой друг.", category: "other" },
+        { rus: "деньги", tat: "акча", example: "Акча юк.", translation: "Денег нет.", category: "other" },
+        { rus: "песня", tat: "җыр", example: "Җыр тыңладым.", translation: "Я слушал песню.", category: "other" }
+    ];
+
+    // 6 категорий для кнопок (соответствие id и названий)
+    const CATEGORIES = [
+        { id: "home_family", name: "🏠 Дом и семья", desc: "мебель, родственники, быт" },
+        { id: "animals", name: "🐾 Животные", desc: "звери, птицы, рыбы" },
+        { id: "food", name: "🍎 Еда", desc: "продукты, блюда" },
+        { id: "nature_seasons", name: "🌿 Времена года и природа", desc: "погода, растения" },
+        { id: "school_work", name: "📚 Школа и работа", desc: "учеба, профессии, офис" },
+        { id: "other", name: "🎭 Другие категории", desc: "чувства, тело, город" }
+    ];
+
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function getWordsByCategory(catId) {
+        return ALL_WORDS.filter(w => w.category === catId);
+    }
+
+    function generateOptions(correctWord, currentRus, pool) {
+        const others = pool.filter(item => item.rus !== currentRus);
+        const shuffled = shuffleArray([...others]);
+        const wrong = shuffled.slice(0, 2).map(w => w.tat);
+        let opts = [correctWord, ...wrong];
+        opts = [...new Set(opts)];
+        while (opts.length < 3) opts.push("бүлмә");
+        return shuffleArray(opts.slice(0, 3));
+    }
+
+    // Глобальное состояние
+    let currentMode = "menu"; // menu, quiz, zen
+    let currentCategoryId = null;
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let currentScore = 0;
+    let answerLock = false;
+    let answered = false;
+    let currentCorrect = "";
+    let currentExample = "";
+    let currentTranslation = "";
+    
+    // Дзен
+    let zenModeActive = false;
+    let zenIndex = 0;
+    let zenScore = 0;
+    let zenQuestionsPool = [];
+    let zenMaxQuestions = 100;
+    
+    const app = document.getElementById('app');
+
+    function renderMenu() {
+        let btnsHtml = '';
+        CATEGORIES.forEach(cat => {
+            btnsHtml += `<button class="cat-btn" data-cat="${cat.id}">${cat.name}<br><span style="font-size:0.7rem;">${cat.desc}</span></button>`;
+        });
+        const html = `
+            <h1>📖 Татарский тренажёр</h1>
+            <div class="sub">6 категорий по 10 вопросов</div>
+            <div class="categories-grid">
+                ${btnsHtml}
+            </div>
+            <div class="zen-wrapper">
+                <button class="cat-btn btn-zen" id="zenModeBtn">🧘‍♂️ Дзен<br><span style="font-size:0.8rem;">все слова</span></button>
+            </div>
+            <footer>Существительные с примерами и переводами</footer>
+        `;
+        app.innerHTML = html;
+        document.querySelectorAll('.cat-btn[data-cat]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const catId = btn.getAttribute('data-cat');
+                startCategoryQuiz(catId);
+            });
+        });
+        const zenBtn = document.getElementById('zenModeBtn');
+        if (zenBtn) zenBtn.addEventListener('click', startZenMode);
+    }
+
+    function startCategoryQuiz(catId) {
+        const words = getWordsByCategory(catId);
+        if (words.length < 10) {
+            alert("В этой категории недостаточно слов (нужно минимум 10).");
+            return;
+        }
+        const shuffledWords = shuffleArray([...words]);
+        const selected = shuffledWords.slice(0, 10);
+        currentQuestions = selected.map(word => ({
+            rus: word.rus,
+            correct: word.tat,
+            tatExample: word.example,
+            exampleTranslation: word.translation,
+            options: generateOptions(word.tat, word.rus, words)
+        }));
+        currentIndex = 0;
+        currentScore = 0;
+        currentMode = "quiz";
+        currentCategoryId = catId;
+        answerLock = false;
+        answered = false;
+        renderQuiz();
+    }
+
+    function renderQuiz() {
+        if (currentIndex >= currentQuestions.length) {
+            showQuizResult();
+            return;
+        }
+        const q = currentQuestions[currentIndex];
+        currentCorrect = q.correct;
+        currentExample = q.tatExample;
+        currentTranslation = q.exampleTranslation;
+        const progress = `${currentIndex+1} / ${currentQuestions.length}`;
+        let answersHtml = '';
+        q.options.forEach(opt => {
+            answersHtml += `<button class="answer-btn" data-value="${escapeHtml(opt)}">${escapeHtml(opt)}</button>`;
+        });
+        const markup = `
+            <div>
+                <div class="stats">
+                    <span>🎯 Счёт: ${currentScore}</span>
+                    <span>📋 Вопрос ${progress}</span>
+                </div>
+                <div class="question-card">
+                    <div class="russian-word">${escapeHtml(q.rus)}</div>
+                    <div class="answers-grid" id="answersGrid">
+                        ${answersHtml}
+                    </div>
+                    <div id="feedbackArea" class="feedback-area" style="display: none;"></div>
+                    <button id="nextBtn" class="next-btn" disabled>➡ Следующий вопрос</button>
+                    <button id="backMenuBtn" class="back-menu-btn">🏠 На главную</button>
+                </div>
+                <footer>Выберите правильный перевод на татарский</footer>
+            </div>
+        `;
+        app.innerHTML = markup;
+        attachQuizHandlers();
+    }
+
+    function attachQuizHandlers() {
+        const btns = document.querySelectorAll('.answer-btn');
+        btns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                if (answerLock) return;
+                const selected = btn.getAttribute('data-value');
+                checkQuizAnswer(selected, btns);
+            });
+        });
+        const backBtn = document.getElementById('backMenuBtn');
+        if (backBtn) backBtn.addEventListener('click', () => { currentMode = "menu"; renderMenu(); });
+    }
+
+    function checkQuizAnswer(selected, allBtns) {
+        if (answered) return;
+        answered = true;
+        answerLock = true;
+        const isCorrect = (selected === currentCorrect);
+        if (isCorrect) currentScore++;
+
+        allBtns.forEach(btn => {
+            const val = btn.getAttribute('data-value');
+            if (val === currentCorrect) btn.classList.add('correct-highlight');
+            if (!isCorrect && val === selected) btn.classList.add('wrong-highlight');
+            btn.disabled = true;
+            btn.classList.add('disabled-btn');
+        });
+
+        const feedbackDiv = document.getElementById('feedbackArea');
+        let feedbackHtml = '';
+        if (isCorrect) {
+            feedbackHtml = `<div class="feedback-correct">✅ Правильно! +1 балл.</div>`;
+            if (currentExample && currentTranslation) {
+                feedbackHtml += `<div class="example-text">📖 Пример: <strong>${escapeHtml(currentExample)}</strong><br>📝 Перевод: ${escapeHtml(currentTranslation)}</div>`;
+            }
+        } else {
+            feedbackHtml = `<div class="feedback-correct">❌ Неправильно. Правильный ответ: <strong>${escapeHtml(currentCorrect)}</strong></div>`;
+        }
+        feedbackDiv.innerHTML = feedbackHtml;
+        feedbackDiv.style.display = 'block';
+
+        const nextBtn = document.getElementById('nextBtn');
+        nextBtn.disabled = false;
+        nextBtn.addEventListener('click', () => {
+            currentIndex++;
+            answered = false;
+            answerLock = false;
+            renderQuiz();
+        }, { once: true });
+    }
+
+    function showQuizResult() {
+        const total = currentQuestions.length;
+        let verdict = "";
+        if (currentScore === total) verdict = "🎉 Отлично! Вы знаток! 🎉";
+        else if (currentScore >= 8) verdict = "👍 Очень хорошо!";
+        else if (currentScore >= 6) verdict = "📘 Неплохо, повторите ещё.";
+        else verdict = "😓 Нужно подтянуть.";
+        
+        const markup = `
+            <div class="result-screen">
+                <h1>🏆 Результат</h1>
+                <div class="score-ring">${currentScore} / ${total}</div>
+                <div class="verdict">${verdict}</div>
+                <button id="restartCatBtn" class="btn-restart">🔄 Ещё раз (та же категория)</button>
+                <button id="menuAfterBtn" class="back-menu-btn">🏠 На главную</button>
+            </div>
+        `;
+        app.innerHTML = markup;
+        document.getElementById('restartCatBtn')?.addEventListener('click', () => startCategoryQuiz(currentCategoryId));
+        document.getElementById('menuAfterBtn')?.addEventListener('click', () => { currentMode = "menu"; renderMenu(); });
+    }
+
+    // -------------------- ДЗЕН (все слова, до 100) --------------------
+    function startZenMode() {
+        const allWords = [...ALL_WORDS];
+        if (allWords.length === 0) return;
+        const shuffledPool = shuffleArray([...allWords]);
+        zenQuestionsPool = shuffledPool.slice(0, zenMaxQuestions);
+        zenIndex = 0;
+        zenScore = 0;
+        zenModeActive = true;
+        currentMode = "zen";
+        renderZenQuestion();
+    }
+
+    function renderZenQuestion() {
+        if (zenIndex >= zenQuestionsPool.length) {
+            showZenResult();
+            return;
+        }
+        const q = zenQuestionsPool[zenIndex];
+        currentCorrect = q.tat;
+        currentExample = q.example;
+        currentTranslation = q.translation;
+        const allWordsList = [...ALL_WORDS];
+        const options = generateOptions(q.tat, q.rus, allWordsList);
+        const progress = `${zenIndex+1} / ${zenQuestionsPool.length}`;
+        let answersHtml = '';
+        options.forEach(opt => {
+            answersHtml += `<button class="answer-btn" data-value="${escapeHtml(opt)}">${escapeHtml(opt)}</button>`;
+        });
+        const markup = `
+            <div>
+                <div class="stats">
+                    <span>🎯 Счёт: ${zenScore}</span>
+                    <span>🧘 Дзен • ${progress}</span>
+                </div>
+                <div class="question-card">
+                    <div class="russian-word">${escapeHtml(q.rus)}</div>
+                    <div class="answers-grid" id="answersGrid">
+                        ${answersHtml}
+                    </div>
+                    <div id="feedbackArea" class="feedback-area" style="display: none;"></div>
+                    <button id="nextZenBtn" class="next-btn" disabled>➡ Следующий вопрос</button>
+                    <button id="exitZenBtn" class="back-menu-btn">🏁 Завершить Дзен и выйти</button>
+                </div>
+                <footer>Дзен-режим: все слова, максимум ${zenQuestionsPool.length} вопросов</footer>
+            </div>
+        `;
+        app.innerHTML = markup;
+        attachZenHandlers();
+    }
+
+    function attachZenHandlers() {
+        const btns = document.querySelectorAll('.answer-btn');
+        btns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                if (answerLock) return;
+                const selected = btn.getAttribute('data-value');
+                checkZenAnswer(selected, btns);
+            });
+        });
+        const exitBtn = document.getElementById('exitZenBtn');
+        if (exitBtn) exitBtn.addEventListener('click', () => { currentMode = "menu"; renderMenu(); });
+    }
+
+    function checkZenAnswer(selected, allBtns) {
+        if (answered) return;
+        answered = true;
+        answerLock = true;
+        const isCorrect = (selected === currentCorrect);
+        if (isCorrect) zenScore++;
+
+        allBtns.forEach(btn => {
+            const val = btn.getAttribute('data-value');
+            if (val === currentCorrect) btn.classList.add('correct-highlight');
+            if (!isCorrect && val === selected) btn.classList.add('wrong-highlight');
+            btn.disabled = true;
+            btn.classList.add('disabled-btn');
+        });
+
+        const feedbackDiv = document.getElementById('feedbackArea');
+        let feedbackHtml = '';
+        if (isCorrect) {
+            feedbackHtml = `<div class="feedback-correct">✅ Верно! +1 балл.</div>`;
+            if (currentExample && currentTranslation) {
+                feedbackHtml += `<div class="example-text">📖 Пример: <strong>${escapeHtml(currentExample)}</strong><br>📝 Перевод: ${escapeHtml(currentTranslation)}</div>`;
+            }
+        } else {
+            feedbackHtml = `<div class="feedback-correct">❌ Ошибка. Правильно: <strong>${escapeHtml(currentCorrect)}</strong></div>`;
+        }
+        feedbackDiv.innerHTML = feedbackHtml;
+        feedbackDiv.style.display = 'block';
+
+        const nextBtn = document.getElementById('nextZenBtn');
+        nextBtn.disabled = false;
+        nextBtn.addEventListener('click', () => {
+            zenIndex++;
+            answered = false;
+            answerLock = false;
+            renderZenQuestion();
+        }, { once: true });
+    }
+
+    function showZenResult() {
+        const total = zenQuestionsPool.length;
+        let verdict = "";
+        if (zenScore === total) verdict = "🎉 Просветление! Идеальный результат! 🎉";
+        else if (zenScore >= total * 0.8) verdict = "👍 Отличная практика!";
+        else if (zenScore >= total * 0.6) verdict = "📘 Хорошо, но есть куда расти.";
+        else verdict = "😓 Продолжайте практиковаться!";
+        
+        const markup = `
+            <div class="result-screen">
+                <h1>🧘 Дзен завершён</h1>
+                <div class="score-ring">${zenScore} / ${total}</div>
+                <div class="verdict">${verdict}</div>
+                <button id="restartZenBtn" class="btn-restart">🔄 Начать Дзен заново</button>
+                <button id="menuAfterZenBtn" class="back-menu-btn">🏠 На главную</button>
+            </div>
+        `;
+        app.innerHTML = markup;
+        document.getElementById('restartZenBtn')?.addEventListener('click', startZenMode);
+        document.getElementById('menuAfterZenBtn')?.addEventListener('click', () => { currentMode = "menu"; renderMenu(); });
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    renderMenu();
+</script>
+</body>
+</html>
