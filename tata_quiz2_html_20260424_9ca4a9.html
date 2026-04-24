@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Татарский тренажёр: существительные</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f0f6f3 0%, #e2ece8 100%);
+            font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .game-container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(4px);
+            border-radius: 2.5rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.3);
+            padding: 2rem 1.8rem 2rem;
+            border: 1px solid rgba(80, 130, 115, 0.25);
+        }
+
+        h1 {
+            font-size: 1.9rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1d6c5e, #2b9b87);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.25rem;
+        }
+
+        .sub {
+            color: #557c70;
+            font-weight: 500;
+            margin-bottom: 1.6rem;
+            border-left: 3px solid #359f8b;
+            padding-left: 0.8rem;
+            font-size: 0.9rem;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            background: #eef3f0;
+            border-radius: 100px;
+            padding: 0.6rem 1.4rem;
+            margin-bottom: 2rem;
+            font-weight: 600;
+            color: #1f5f54;
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 2rem;
+            padding: 1.8rem 1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.05);
+        }
+
+        .russian-word {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a4e45;
+            background: #f4fbf8;
+            display: inline-block;
+            padding: 0.3rem 1.5rem;
+            border-radius: 60px;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .answers-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+            margin: 1.5rem 0 1rem;
+        }
+
+        .answer-btn {
+            background: #f9fefc;
+            border: 2px solid #cde3dc;
+            border-radius: 60px;
+            padding: 0.9rem 1rem;
+            font-size: 1.15rem;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            color: #216b5e;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .answer-btn:hover:not(:disabled) {
+            background: #e5f4ef;
+            border-color: #6fc1b0;
+            transform: scale(1.01);
+        }
+
+        .answer-btn.correct-highlight {
+            background: #c8f0e4;
+            border-color: #169b80;
+            color: #0c5c4b;
+            box-shadow: 0 0 0 2px #b3e0d4;
+        }
+
+        .answer-btn.wrong-highlight {
+            background: #ffe0db;
+            border-color: #e0826e;
+            color: #9b3e2c;
+        }
+
+        .disabled-btn {
+            cursor: default;
+            opacity: 0.8;
+        }
+
+        .feedback-area {
+            background: #f8fefb;
+            padding: 1rem 1rem;
+            border-radius: 1.5rem;
+            margin: 1rem 0;
+            text-align: left;
+            font-size: 0.95rem;
+            border-left: 5px solid #2b9b87;
+        }
+
+        .feedback-correct {
+            color: #1d6c5e;
+            font-weight: 600;
+        }
+
+        .example-text {
+            background: #f0f5f2;
+            padding: 0.6rem;
+            border-radius: 1rem;
+            margin-top: 0.6rem;
+            font-family: monospace;
+        }
+
+        .next-btn {
+            background: #2b9b87;
+            border: none;
+            padding: 0.9rem 1.8rem;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 3rem;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .next-btn:hover {
+            background: #1e7f6e;
+            transform: translateY(-2px);
+        }
+
+        .next-btn:disabled {
+            background: #aacbc2;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-screen {
+            text-align: center;
+        }
+
+        .score-ring {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: #f2f9f6;
+            display: inline-block;
+            padding: 0.5rem 1.8rem;
+            border-radius: 100px;
+            margin: 1rem 0;
+            color: #236b5e;
+        }
+
+        .verdict {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin: 0.8rem 0;
+        }
+
+        .btn-restart {
+            background: #2b9b87;
+            border: none;
+            padding: 0.9rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 3rem;
+            color: white;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        footer {
+            margin-top: 2rem;
+            font-size: 0.7rem;
+            text-align: center;
+            color: #85ada2;
+        }
+    </style>
+</head>
+<body>
+<div class="game-container" id="app"></div>
+
+<script>
+    // ================================================================
+    // БАЗА СУЩЕСТВИТЕЛЬНЫХ (только проверенные)
+    // Каждый элемент: { rus, tat, example, translation }
+    // ================================================================
+    const NOUNS_DATA = [
+        // --- Дом, мебель, посуда ---
+        { rus: "окно", tat: "тәрәзә", example: "Тәрәзәдән кояш керә.", translation: "В окно заходит солнце." },
+        { rus: "тарелка", tat: "тәлинкә", example: "Тәлинкәне өстәлгә куй.", translation: "Поставь тарелку на стол." },
+        { rus: "чашка (для чая)", tat: "чынаяк", example: "Бер чынаяк чәй эчтем.", translation: "Я выпил одну чашку чая." },
+        { rus: "ложка", tat: "кашык", example: "Кашык белән аш аша.", translation: "Ешь суп ложкой." },
+        { rus: "стул", tat: "урындык", example: "Бу урындык бик уңайлы.", translation: "Этот стул очень удобный." },
+        { rus: "стол", tat: "өстәл", example: "Өстәлдә китап ята.", translation: "На столе лежит книга." },
+        { rus: "пол", tat: "идән", example: "Идән пычрак, чистартырга кирәк.", translation: "Пол грязный, нужно почистить." },
+        { rus: "дверь", tat: "ишек", example: "Ишекне яп, салкын керә.", translation: "Закрой дверь, холодно." },
+        { rus: "комната", tat: "бүлмә", example: "Минем бүлмәм зур түгел.", translation: "Моя комната не большая." },
+        { rus: "кровать", tat: "карават", example: "Караватка яттым.", translation: "Я лёг в кровать." },
+        { rus: "полка", tat: "киштә", example: "Киштәдә китаплар тора.", translation: "На полке стоят книги." },
+        { rus: "коробка, ящик", tat: "тартма", example: "Акбурларны тартмага сал.", translation: "Положи мелки в коробку." },
+        { rus: "холодильник", tat: "суыткыч", example: "Суыткычта сөт бар.", translation: "В холодильнике есть молоко." },
+        { rus: "печь (отопительная)", tat: "мич", example: "Мичтә ут яна.", translation: "В печи горит огонь." },
+        { rus: "плита (кухонная)", tat: "плитә", example: "Ашны плитәдә пешерәм.", translation: "Я готовлю суп на плите." },
+        { rus: "кастрюля", tat: "кәстрүл", example: "Кәстрүлгә су салдым.", translation: "Я налил воду в кастрюлю." },
+        { rus: "нож", tat: "пычак", example: "Пычак белән икмәк кис.", translation: "Режь хлеб ножом." },
+        { rus: "тряпка", tat: "чүпрәк", example: "Чүпрәк белән өстәлне сөрт.", translation: "Вытри стол тряпкой." },
+        { rus: "расчёска", tat: "тарак", example: "Чәчемне тарак белән тарадым.", translation: "Я расчесал волосы расчёской." },
+        { rus: "часы", tat: "сәгать", example: "Сәгать ничә?", translation: "Который час?" },
+        { rus: "стекло", tat: "пыяла", example: "Пыяланы ватма.", translation: "Не разбей стекло." },
+        { rus: "игрушка", tat: "уенчык", example: "Балалар уенчыклар белән уйный.", translation: "Дети играют с игрушками." },
+        { rus: "кукла", tat: "курчак", example: "Аңа яңа курчак бүләк иттеләр.", translation: "Ей подарили новую куклу." },
+        { rus: "полотенце", tat: "сөлге", example: "Кулларымны сөлге белән сөрттем.", translation: "Я вытер руки полотенцем." },
+        { rus: "ёлка", tat: "чыршы", example: "Бүлмәдә матур чыршы тора.", translation: "В комнате стоит красивая ёлка." },
+        { rus: "подарок", tat: "бүләк", example: "Сиңа бүләк алдым.", translation: "Я купил тебе подарок." },
+        { rus: "место", tat: "урын", example: "Бу урын бик матур.", translation: "Это место очень красивое." },
+        { rus: "мебель", tat: "җиһаз", example: "Без яңа җиһаз алдык.", translation: "Мы купили новую мебель." },
+        
+        // --- Семья, люди ---
+        { rus: "бабушка", tat: "әби", example: "Әби матур итеп аш пешерә.", translation: "Бабушка вкусно готовит." },
+        { rus: "дедушка", tat: "дәү әти", example: "Дәү әтигә 80 яшь.", translation: "Дедушке 80 лет." },
+        { rus: "мама", tat: "әни", example: "Әнием эштә.", translation: "Моя мама на работе." },
+        { rus: "папа", tat: "әти", example: "Әтием машина йөртә.", translation: "Мой папа водит машину." },
+        { rus: "ребёнок (дети)", tat: "бала", example: "Балалар бакчада уйный.", translation: "Дети играют в саду." },
+        { rus: "мальчик", tat: "малай", example: "Малай китап укый.", translation: "Мальчик читает книгу." },
+        { rus: "девочка", tat: "кыз", example: "Кыз бик матур.", translation: "Девочка очень красивая." },
+        { rus: "младший брат", tat: "эне", example: "Минем энем кечкенә.", translation: "Мой младший брат маленький." },
+        { rus: "младшая сестра", tat: "сеңел", example: "Сеңелем кызлар белән уйный.", translation: "Моя сестра играет с девочками." },
+        { rus: "старший брат / дядя", tat: "абый", example: "Абый эшли, энем укый.", translation: "Старший брат работает, младший учится." },
+        { rus: "жена", tat: "хатын", example: "Хатыным белән кибеткә бардым.", translation: "Я с женой пошёл в магазин." },
+        { rus: "мужчина", tat: "ир", example: "Ир эшкә бара.", translation: "Мужчина идёт на работу." },
+        { rus: "человек", tat: "кеше", example: "Бүлмәдә кеше юк.", translation: "В комнате нет людей." },
+        { rus: "народ", tat: "халык", example: "Татар халкы кунакчыл.", translation: "Татарский народ гостеприимный." },
+        { rus: "друг", tat: "дус", example: "Бу минем дусым.", translation: "Это мой друг." },
+        { rus: "семья", tat: "гаилә", example: "Гаиләм зур.", translation: "Моя семья большая." },
+        { rus: "коллега", tat: "эштәш", example: "Эштәшем ярдәм итте.", translation: "Мой коллега помог." },
+        { rus: "учитель", tat: "укытучы", example: "Укытучы дәрес аңлата.", translation: "Учитель объясняет урок." },
+        { rus: "ученик", tat: "укучы", example: "Укучылар укыйлар.", translation: "Ученики учатся." },
+        
+        // --- Еда ---
+        { rus: "суп, еда", tat: "аш", example: "Аш бик тәмле.", translation: "Суп очень вкусный." },
+        { rus: "хлеб", tat: "ипи", example: "Ипи сатып алдым.", translation: "Я купил хлеб." },
+        { rus: "батон", tat: "күмәч", example: "Күмәч кистергә?", translation: "Нарезать батон?" },
+        { rus: "чай", tat: "чәй", example: "Чәй эчәсе килә.", translation: "Хочется чаю." },
+        { rus: "молоко", tat: "сөт", example: "Сөт салкын.", translation: "Молоко холодное." },
+        { rus: "сок", tat: "сок", example: "Апельсин сокы эчтем.", translation: "Я выпил апельсиновый сок." },
+        { rus: "апельсин", tat: "әфлисун", example: "Әфлисун витаминлы.", translation: "Апельсин богат витаминами." },
+        { rus: "помидор", tat: "помидор", example: "Помидорлар кызыл.", translation: "Помидоры красные." },
+        { rus: "картофель", tat: "бәрәңге", example: "Бәрәңге пешердек.", translation: "Мы сварили картошку." },
+        { rus: "морковь", tat: "кишер", example: "Кишер файдалы.", translation: "Морковь полезная." },
+        { rus: "лук", tat: "суган", example: "Суган ачы.", translation: "Лук горький." },
+        { rus: "капуста", tat: "кәбестә", example: "Кәбестәдән салат ясадым.", translation: "Я сделал салат из капусты." },
+        { rus: "огурец", tat: "кыяр", example: "Кыяр тозладык.", translation: "Мы засолили огурцы." },
+        { rus: "чеснок", tat: "сарымсак", example: "Сарымсак ашны тәмләндерә.", translation: "Чеснок придаёт супу вкус." },
+        { rus: "яйцо", tat: "йомырка", example: "Йомырка пешкән.", translation: "Яйцо сварилось." },
+        { rus: "мясо", tat: "ит", example: "Ит озак пешә.", translation: "Мясо долго варится." },
+        { rus: "рыба", tat: "балык", example: "Балык бәрәңге белән яхшы.", translation: "Рыба с картошкой хороша." },
+        { rus: "курица", tat: "тавык", example: "Тавык шулпасы пешердем.", translation: "Я сварил куриный бульон." },
+        { rus: "сметана", tat: "каймак", example: "Каймак аш өстенә салынды.", translation: "Сметану положили на суп." },
+        { rus: "творог", tat: "эремчек", example: "Эремчекле бәлеш пешердем.", translation: "Я испёк пирог с творогом." },
+        { rus: "масло сливочное", tat: "май", example: "Ипигә май җәйдек.", translation: "Намазали масло на хлеб." },
+        { rus: "соль", tat: "тоз", example: "Ашка тоз сал.", translation: "Посоли суп." },
+        { rus: "сахар", tat: "шикәр", example: "Чәйгә шикәр салма.", translation: "Не клади сахар в чай." },
+        { rus: "мёд", tat: "бал", example: "Бал биек тәмле.", translation: "Мёд очень вкусный." },
+        
+        // --- Природа, растения, животные ---
+        { rus: "дерево", tat: "агач", example: "Агач биек.", translation: "Дерево высокое." },
+        { rus: "лес", tat: "урман", example: "Урманда матур.", translation: "В лесу красиво." },
+        { rus: "лист", tat: "яфрак", example: "Яфраклар саргайган.", translation: "Листья пожелтели." },
+        { rus: "цветок", tat: "чәчәк", example: "Чәчәкләр үсә.", translation: "Цветы растут." },
+        { rus: "трава", tat: "үлән", example: "Үлән яшел.", translation: "Трава зелёная." },
+        { rus: "сад", tat: "бакча", example: "Бакча чистартылган.", translation: "Сад убран." },
+        { rus: "земля, грунт", tat: "җир", example: "Җирне казыйбыз.", translation: "Копаем землю." },
+        { rus: "снег", tat: "кар", example: "Кар ява.", translation: "Идёт снег." },
+        { rus: "дождь", tat: "яңгыр", example: "Яңгыр ява.", translation: "Идёт дождь." },
+        { rus: "лёд", tat: "боз", example: "Боз шома.", translation: "Лёд скользкий." },
+        { rus: "река", tat: "елга", example: "Елгада балык бар.", translation: "В реке есть рыба." },
+        { rus: "озеро", tat: "күл", example: "Күлдә су салкын.", translation: "В озере вода холодная." },
+        { rus: "небо", tat: "күк", example: "Күк йөзе чиста.", translation: "Небо чистое." },
+        { rus: "солнце", tat: "кояш", example: "Кояш чыкты.", translation: "Солнце встало." },
+        { rus: "ветер", tat: "җил", example: "Җил көчле исә.", translation: "Ветер сильно дует." },
+        { rus: "гора", tat: "тау", example: "Тау биек.", translation: "Гора высокая." },
+        { rus: "облако", tat: "болыт", example: "Күк болытлы.", translation: "Небо облачное." },
+        { rus: "ворона", tat: "карга", example: "Карга агачта утыра.", translation: "Ворона сидит на дереве." },
+        { rus: "птица", tat: "кош", example: "Кош оча.", translation: "Птица летит." },
+        { rus: "заяц", tat: "куян", example: "Куян кыска койрыклы.", translation: "У зайца короткий хвост." },
+        { rus: "лиса", tat: "төлке", example: "Төлке куян эзли.", translation: "Лиса ищет зайца." },
+        { rus: "волк", tat: "бүре", example: "Бүре ач.", translation: "Волк голодный." },
+        { rus: "медведь", tat: "аю", example: "Аю урманда йоклый.", translation: "Медведь спит в лесу." },
+        { rus: "ёжик", tat: "керпе", example: "Керпе энәле.", translation: "Ёж колючий." },
+        { rus: "собака", tat: "эт", example: "Эт өрә.", translation: "Собака лает." },
+        { rus: "кошка", tat: "песи", example: "Песи йоклый.", translation: "Кошка спит." },
+        
+        // --- Школа, учёба ---
+        { rus: "школа", tat: "мәктәп", example: "Мәктәпкә бардым.", translation: "Я пошёл в школу." },
+        { rus: "класс (комната)", tat: "сыйныф", example: "Безнең сыйныф якты.", translation: "Наш класс светлый." },
+        { rus: "перемена", tat: "тәнәфес", example: "Тәнәфестә уйныйбыз.", translation: "В перемену играем." },
+        { rus: "урок", tat: "дәрес", example: "Дәрес башланды.", translation: "Урок начался." },
+        { rus: "доска", tat: "такта", example: "Тактада сүзләр язылган.", translation: "На доске написаны слова." },
+        { rus: "мел", tat: "акбур", example: "Акбур белән яз.", translation: "Пиши мелом." },
+        { rus: "тетрадь", tat: "дәфтәр", example: "Дәфтәргә язам.", translation: "Я пишу в тетради." },
+        { rus: "ручка", tat: "каләм", example: "Каләм югалды.", translation: "Ручка потерялась." },
+        { rus: "книга", tat: "китап", example: "Китапны укыдым.", translation: "Я прочитал книгу." },
+        { rus: "учебник", tat: "дәреслек", example: "Дәреслек алдым.", translation: "Я взял учебник." },
+        { rus: "азбука", tat: "әлифба", example: "Әлифба өйрәнәм.", translation: "Учу азбуку." },
+        { rus: "буква", tat: "хәреф", example: "Хәрефләрне яз.", translation: "Напиши буквы." },
+        { rus: "слово", tat: "сүз", example: "Бу сүзне аңладым.", translation: "Я понял это слово." },
+        { rus: "оценка", tat: "билге", example: "Бишле алдым.", translation: "Получил пятёрку." },
+        
+        // --- Город, транспорт ---
+        { rus: "город", tat: "шәһәр", example: "Казан зур шәһәр.", translation: "Казань — большой город." },
+        { rus: "столица", tat: "башкала", example: "Казан — башкала.", translation: "Казань — столица." },
+        { rus: "улица", tat: "урам", example: "Урамда кешеләр күп.", translation: "На улице много людей." },
+        { rus: "дорога", tat: "юл", example: "Юл озын.", translation: "Дорога длинная." },
+        { rus: "магазин", tat: "кибет", example: "Кибеткә кердем.", translation: "Я зашёл в магазин." },
+        { rus: "рынок", tat: "базар", example: "Базарда яшелчәләр саталар.", translation: "На рынке продают овощи." },
+        { rus: "больница", tat: "хастаханә", example: "Хастаханәдә эшли.", translation: "Работает в больнице." },
+        { rus: "автобус", tat: "автобус", example: "Автобус монда йөрми.", translation: "Автобус здесь не ходит." },
+        { rus: "машина", tat: "машина", example: "Машина йөртә.", translation: "Водит машину." },
+        
+        // --- Время, сезоны ---
+        { rus: "время", tat: "вакыт", example: "Вакыт тиз уза.", translation: "Время быстро идёт." },
+        { rus: "день", tat: "көн", example: "Бүген яхшы көн.", translation: "Сегодня хороший день." },
+        { rus: "ночь", tat: "төн", example: "Төн озын.", translation: "Ночь длинная." },
+        { rus: "неделя", tat: "атна", example: "Атнада биш көн эшлибез.", translation: "В неделю работаем пять дней." },
+        { rus: "весна", tat: "яз", example: "Яз җитте.", translation: "Весна наступила." },
+        { rus: "лето", tat: "җәй", example: "Җәйдә кояшлы.", translation: "Летом солнечно." },
+        { rus: "осень", tat: "көз", example: "Көзен салкын.", translation: "Осенью холодно." },
+        { rus: "зима", tat: "кыш", example: "Кышын кар күп.", translation: "Зимой много снега." }
+    ];
+
+    // Вспомогательные функции
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    // Генерация 3 вариантов: правильный + два случайных неправильных
+    function generateOptions(correctWord, currentRus, allItems) {
+        const others = allItems.filter(item => item.rus !== currentRus);
+        if (others.length < 2) return [correctWord, "китап", "өстәл"];
+        const shuffled = shuffleArray([...others]);
+        const wrong = [shuffled[0].tat, shuffled[1].tat];
+        let opts = [correctWord, ...wrong];
+        opts = [...new Set(opts)];
+        while (opts.length < 3) opts.push("бүлмә");
+        return shuffleArray(opts.slice(0, 3));
+    }
+
+    // Подготовка 10 случайных вопросов
+    function prepareQuestions() {
+        const shuffledAll = shuffleArray([...NOUNS_DATA]);
+        const selected = shuffledAll.slice(0, 10);
+        return selected.map(item => ({
+            rus: item.rus,
+            correct: item.tat,
+            tatExample: item.example,
+            exampleTranslation: item.translation,
+            options: generateOptions(item.tat, item.rus, NOUNS_DATA)
+        }));
+    }
+
+    // Оценка результата (как в глаголах)
+    function getVerdict(scoreValue) {
+        if (scoreValue === 10) return { title: "🎉 Отлично! Вы знаток татарских слов! 🎉", message: "10 из 10! Безупречно!" };
+        if (scoreValue >= 8) return { title: "👍 Очень хорошо!", message: `${scoreValue} правильных. Вы на верном пути!` };
+        if (scoreValue >= 6) return { title: "📘 Неплохо", message: `${scoreValue} верных. Повторите ещё — и будет отлично.` };
+        return { title: "😓 Нужно подтянуть", message: `${scoreValue} правильных. Попробуйте ещё раз, слова запомнятся!` };
+    }
+
+    // --- Игровое состояние ---
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let answerLock = false;      // блокировка после ответа
+    let answered = false;
+    let currentCorrectWord = "";
+    let currentExample = "";
+    let currentTranslation = "";
+    let currentOptions = [];
+
+    const app = document.getElementById('app');
+
+    function renderQuestion() {
+        if (currentIndex >= currentQuestions.length) {
+            showResult();
+            return;
+        }
+        const q = currentQuestions[currentIndex];
+        currentCorrectWord = q.correct;
+        currentExample = q.tatExample;
+        currentTranslation = q.exampleTranslation;
+        currentOptions = q.options;
+        const progress = `${currentIndex+1} / ${currentQuestions.length}`;
+
+        let answersHtml = '';
+        currentOptions.forEach(opt => {
+            answersHtml += `<button class="answer-btn" data-value="${escapeHtml(opt)}">${escapeHtml(opt)}</button>`;
+        });
+
+        const markup = `
+            <div>
+                <div class="stats">
+                    <span>🎯 Счёт: ${score}</span>
+                    <span>📋 Вопрос ${progress}</span>
+                </div>
+                <div class="question-card">
+                    <div class="russian-word">${escapeHtml(q.rus)}</div>
+                    <div class="answers-grid" id="answersGrid">
+                        ${answersHtml}
+                    </div>
+                    <div id="feedbackArea" class="feedback-area" style="display: none;"></div>
+                    <button id="nextBtn" class="next-btn" disabled>➡ Следующий вопрос</button>
+                </div>
+                <footer>Выберите правильный перевод на татарский</footer>
+            </div>
+        `;
+        app.innerHTML = markup;
+
+        // Навешиваем обработчики на кнопки ответов
+        const btns = document.querySelectorAll('.answer-btn');
+        btns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                if (answerLock) return;
+                const selected = btn.getAttribute('data-value');
+                checkAnswer(selected, btns);
+            });
+        });
+        answerLock = false;
+        answered = false;
+    }
+
+    function checkAnswer(selected, allBtns) {
+        if (answered) return;
+        answered = true;
+        answerLock = true;
+        const isCorrect = (selected === currentCorrectWord);
+        if (isCorrect) score++;
+
+        // Подсветка
+        allBtns.forEach(btn => {
+            const val = btn.getAttribute('data-value');
+            if (val === currentCorrectWord) btn.classList.add('correct-highlight');
+            if (!isCorrect && val === selected) btn.classList.add('wrong-highlight');
+            btn.disabled = true;
+            btn.classList.add('disabled-btn');
+        });
+
+        const feedbackDiv = document.getElementById('feedbackArea');
+        let feedbackHtml = '';
+        if (isCorrect) {
+            feedbackHtml = `<div class="feedback-correct">✅ Правильно! +1 балл.</div>`;
+            if (currentExample && currentTranslation) {
+                feedbackHtml += `<div class="example-text">📖 Пример: <strong>${escapeHtml(currentExample)}</strong><br>📝 Перевод: ${escapeHtml(currentTranslation)}</div>`;
+            } else {
+                feedbackHtml += `<div class="example-text">✨ Отличная работа!</div>`;
+            }
+        } else {
+            feedbackHtml = `<div class="feedback-correct">❌ Неправильно. Правильный ответ: <strong>${escapeHtml(currentCorrectWord)}</strong></div>`;
+        }
+        feedbackDiv.innerHTML = feedbackHtml;
+        feedbackDiv.style.display = 'block';
+
+        // Активируем кнопку "Следующий вопрос"
+        const nextBtn = document.getElementById('nextBtn');
+        nextBtn.disabled = false;
+        nextBtn.addEventListener('click', () => {
+            currentIndex++;
+            answered = false;
+            answerLock = false;
+            renderQuestion();
+        }, { once: true });
+    }
+
+    function showResult() {
+        const verdict = getVerdict(score);
+        app.innerHTML = `
+            <div class="result-screen">
+                <h1>🏆 Тренировка завершена</h1>
+                <div class="score-ring">${score} / 10</div>
+                <div class="verdict">${verdict.title}</div>
+                <div class="verdict-message">${verdict.message}</div>
+                <button class="btn-restart" id="restartBtn">🔄 Сыграть ещё раз</button>
+                <footer>Татарские существительные с примерами</footer>
+            </div>
+        `;
+        document.getElementById('restartBtn')?.addEventListener('click', () => initGame());
+    }
+
+    function initGame() {
+        currentQuestions = prepareQuestions();
+        currentIndex = 0;
+        score = 0;
+        answerLock = false;
+        answered = false;
+        renderQuestion();
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    initGame();
+</script>
+</body>
+</html>
